@@ -14,6 +14,7 @@ class BookController {
    */
   static saveBook(req, res) {
     const reqId = shortid.generate();
+    const { ISBN } = req.body;
 
     if (Object.keys(req.body) < 1) {
       return res.status(400).send({
@@ -23,7 +24,7 @@ class BookController {
     }
     console.log(`Request ID: ${reqId}. Book saving in progress`);
     const database = firebase.database();
-    database.ref('books').push().set(req.body)
+    database.ref('books/' + ISBN).set(req.body)
       .then(() => {
         console.log(`Request ID: ${reqId}. Book successfully saved!`);
         return res.status(201).send({
@@ -49,7 +50,6 @@ class BookController {
    */
   static getAllBooks(req, res) {
     const reqId = shortid.generate();
-    console.log(req.headers);
     const database = firebase.database();
 
     console.log(`Request ID: ${reqId}. Fetching all books in the database`);

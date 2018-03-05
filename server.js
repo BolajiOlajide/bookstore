@@ -8,7 +8,7 @@ import BookRoutes from './routes/book.route';
 dotenv.config();
 
 const app = express();
-const { PORT } = process.env;
+const PORT = parseInt(process.env.PORT, 10) || 7700;
 
 app.use('/books', BookRoutes);
 

@@ -56,6 +56,14 @@ class BookController {
 
     database.ref('books').once('value')
       .then((snapshot) => {
+        const exists = (snapshot.val() !== null);
+        if (!exists) {
+          console.log(`Request ID: ${reqId}. No books found!`);
+          return res.status(404).send({
+            status: 'error',
+            message: 'No book available in the database.'
+          });
+        }
         console.log(`Request ID: ${reqId}. Books successfully fetched!`);
         return res.status(200).send({
           status: 'success',
@@ -64,6 +72,45 @@ class BookController {
       })
       .catch((error) => {
         console.log(`Request ID: ${reqId}. Error fetching books from the database!`);
+        return res.status(500).send({
+          status: 'error',
+          message: 'Error fetching books from the database'
+        });
+      });
+  }
+
+  /**
+   * @static
+   * @param {object} request
+   * @param {object} response
+   * @memberOf BookController
+   */
+  static getABook(req, res) {
+    const reqId = shortid.generate();
+    const database = firebase.database();
+
+    const { id } = req.params;
+
+    console.log(`Request ID: ${reqId}. Fetching book with id:${id} in the database`);
+
+    database.ref('books/' + id).once('value')
+      .then((snapshot) => {
+        const exists = (snapshot.val() !== null);
+        if (!exists) {
+          console.log(`Request ID: ${reqId}. Book with ID:${id} is not found.`);
+          return res.status(404).send({
+            status: 'error',
+            message: `BookID ${id} not available in the database.`
+          });
+        }
+        console.log(`Request ID: ${reqId}. Book with id:${id} successfully fetched!`);
+        return res.status(200).send({
+          status: 'success',
+          data: snapshot
+        });
+      })
+      .catch((error) => {
+        console.log(`Request ID: ${reqId}. Error fetching book with id:${id}`);
         return res.status(500).send({
           status: 'error',
           message: 'Error fetching books from the database'
